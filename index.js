@@ -1,12 +1,15 @@
-import fs from "fs";
+import fs, { existsSync } from "fs";
+const folderToRead = process.argv[2];
+if (!fs.existsSync(folderToRead)) {
+  console.log("no such file");
+  process.exit();
+}
 
-const folderContents = fs.readdirSync("friends_first-season_english");
+const folderContents = fs.readdirSync(folderToRead);
 let allContent = "";
 
 for (let i = 0; i < folderContents.length; i++) {
-  allContent += fs.readFileSync(
-    "friends_first-season_english/" + folderContents[i]
-  );
+  allContent += fs.readFileSync(folderToRead + "/" + folderContents[i]);
 }
 allContent = allContent
   .replace(/[^(a-z)]/gi, " ")
