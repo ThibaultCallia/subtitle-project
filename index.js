@@ -24,7 +24,7 @@ if (!fs.existsSync(folderToRead)) {
 //    -
 
 const wordsArray = createArray(folderToRead);
-console.log(sortAll(wordsArray));
+console.log(sortAllAlpha(wordsArray));
 // console.log(sortAll(arr));
 
 function createArray(folderToRead) {
@@ -65,12 +65,37 @@ function sortAll(arr) {
       arr2.push(`${key} ${wordsOcc[key]}`);
     }
   }
-  return arr2;
+  const obj = {};
+  arr2.forEach((element) => {
+    obj[element] = parseInt(element.replace(/[a-z ']/g, ""), 10);
+  });
 
-  const uniqueWords = Object.keys(wordsOcc);
-  uniqueWords.sort((a, b) => wordsOcc[b] - wordsOcc[a]);
+  const uniqueWordsSorted = Object.keys(obj);
+  uniqueWordsSorted.sort((a, b) => obj[b] - obj[a]);
 
-  return uniqueWords;
+  return uniqueWordsSorted;
 }
 
+function sortAllAlpha(arr) {
+  const wordsOcc = arr.reduce(function (obj, word) {
+    obj[word] = obj[word] + 1 || 1;
+    return obj;
+  }, {});
+  const arr2 = [];
+
+  for (const key in wordsOcc) {
+    if (wordsOcc.hasOwnProperty(key)) {
+      arr2.push(`${key} ${wordsOcc[key]}`);
+    }
+  }
+  const obj = {};
+  arr2.forEach((element) => {
+    obj[element] = parseInt(element.replace(/[a-z ']/g, ""), 10);
+  });
+
+  const uniqueWordsSorted = Object.keys(obj);
+  uniqueWordsSorted.sort();
+
+  return uniqueWordsSorted;
+}
 function specificWord(word) {}
