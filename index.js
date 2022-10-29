@@ -9,9 +9,7 @@ import rl from "readline-sync";
         If nothing provided, rl.question is chosen
 */
 
-const folderToRead = rl.question(
-  "Please provide folder \n(or enter STOP to quit\n)"
-);
+const folderToRead = rl.question("Please provide folder \n");
 // if (folderToRead == "STOP") {
 //   process.exit();
 // }
@@ -20,8 +18,13 @@ if (!fs.existsSync(folderToRead)) {
   process.exit();
 }
 
-const arr = createArray(folderToRead);
-console.log(arr);
+// readline question : what do you want to do?
+//    - Look for specific word
+//    - Sort all words
+//    -
+
+const wordsArray = createArray(folderToRead);
+console.log(sortAll(wordsArray));
 // console.log(sortAll(arr));
 
 function createArray(folderToRead) {
@@ -41,18 +44,28 @@ function createArray(folderToRead) {
     .replace(/ +/g, " ")
     .toLowerCase();
 
-  return allContent.split(" ").filter((a) => a.length > 0);
+  // change logic to exempt " I " or " I'" from lower case letters? Only I's with space around
+
+  return allContent
+    .split(" ")
+    .filter((a) => a.length > 0)
+    .map((x) => x.replace(/'s/, ""))
+    .map((x) => x.replace(/s'/, "s"));
 }
-// readline question : what do you want to do?
-//    - Look for specific word
-//    - Sort all words
-//    -
 
 function sortAll(arr) {
   const wordsOcc = arr.reduce(function (obj, word) {
     obj[word] = obj[word] + 1 || 1;
     return obj;
   }, {});
+  const arr2 = [];
+
+  for (const key in wordsOcc) {
+    if (wordsOcc.hasOwnProperty(key)) {
+      arr2.push(`${key} ${wordsOcc[key]}`);
+    }
+  }
+  return arr2;
 
   const uniqueWords = Object.keys(wordsOcc);
   uniqueWords.sort((a, b) => wordsOcc[b] - wordsOcc[a]);
