@@ -17,13 +17,33 @@ if (!fs.existsSync(folderToRead)) {
   console.log("no such file");
   process.exit();
 }
-
-// readline question : what do you want to do?
-//    - Look for specific word
-//    - Sort all words
-//    -
-
 const wordsArray = createArray(folderToRead);
+
+const choices = [
+  "List all occurrences (sorted according to occurrence)",
+  "List all occurrences (sorted alphabetically)",
+  "Occurrence of one word",
+  "Compare multiple words",
+];
+const choice = rl.keyInSelect(choices, "What do you wish to do?");
+switch (choice) {
+  case 0:
+    console.log(sortAll(wordsArray));
+    process.exit();
+  case 1:
+    console.log(sortAllAlpha(wordsArray));
+    process.exit();
+  case 2:
+    console.log(specificWord(wordsArray));
+    process.exit();
+  case 3:
+    console.log(compareWords(wordsArray));
+    process.exit();
+  default:
+    console.log("Bye!");
+    process.exit();
+}
+
 console.log(sortAllAlpha(wordsArray));
 // console.log(sortAll(arr));
 
@@ -54,22 +74,27 @@ function createArray(folderToRead) {
 }
 
 function sortAll(arr) {
+  //reduce to object with keys (word) and values (occurrence)
   const wordsOcc = arr.reduce(function (obj, word) {
     obj[word] = obj[word] + 1 || 1;
     return obj;
   }, {});
-  const arr2 = [];
 
+  // create new array with words and occurrences merged as string
+  const arr2 = [];
   for (const key in wordsOcc) {
     if (wordsOcc.hasOwnProperty(key)) {
       arr2.push(`${key} ${wordsOcc[key]}`);
     }
   }
+
+  // new object with previously created string as keys and occurrence as value
   const obj = {};
   arr2.forEach((element) => {
     obj[element] = parseInt(element.replace(/[a-z ']/g, ""), 10);
   });
 
+  // create array with only keys and sort that according to values
   const uniqueWordsSorted = Object.keys(obj);
   uniqueWordsSorted.sort((a, b) => obj[b] - obj[a]);
 
@@ -98,4 +123,37 @@ function sortAllAlpha(arr) {
 
   return uniqueWordsSorted;
 }
-function specificWord(word) {}
+function specificWord(arr) {
+  const word = rl.question("Which word?\n");
+  const occurrence = arr.filter((x) => x == word.toLowerCase()).length;
+  return `${word} occurs ${occurrence} times in ${folderToRead}.\n`;
+}
+
+function compareWords(arr) {
+  const words = [];
+  let word = "";
+  let counter = 1;
+  let reply = "\n";
+
+  // create array of words with readline
+  do {
+    word = rl.question(`type word ${counter} or type STOP\n`);
+    counter++;
+    words.push(word);
+  } while (word != "STOP");
+  words.pop();
+  if (words.length == 0) {
+    process.exit();
+  }
+
+  // Form reply
+  reply += `${words[0]} occurs ${
+    arr.filter((x) => x == words[0].toLowerCase()).length
+  } times in ${folderToRead}.\n`;
+  for (let i = 1; i < words.length; i++) {
+    const occurrence = arr.filter((x) => x == words[i].toLowerCase()).length;
+    reply += `${words[i]}: ${occurrence} times.\n`;
+  }
+
+  return reply;
+}
